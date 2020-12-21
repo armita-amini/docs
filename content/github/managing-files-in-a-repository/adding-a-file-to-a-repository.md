@@ -1,35 +1,173 @@
----
-title: Adding a file to a repository
-intro: 'You can upload and commit an existing file to a {% data variables.product.product_name %} repository. Drag and drop a file to any directory in the file tree, or upload files from the repository''s main page.'
-redirect_from:
-  - /articles/adding-a-file-to-a-repository
-versions:
-  free-pro-team: '*'
-  enterprise-server: '*'
-  github-ae: '*'
----
+package paint;
 
-Files that you add to a repository via a browser are limited to {% data variables.large_files.max_github_browser_size %} per file. You can add larger files, up to {% data variables.large_files.max_github_size %} each, via the command line. For more information, see "[Adding a file to a repository using the command line](/articles/adding-a-file-to-a-repository-using-the-command-line)."
+import basis.*;
 
-{% tip %}
+public class Paint {
 
-**Tips:**
-- You can upload multiple files to {% data variables.product.product_name %} at the same time.
-- {% data reusables.repositories.protected-branches-block-web-edits-uploads %}
+    // Deklaration
 
-{% endtip %}
+    private Fenster fenster;
+    private Leinwand leinwand;
+    private Stift meinStift, farbStift; 
+    private Stift spiegelStift;
+    private boolean spiegeln;
+    private Maus meineMaus;
+    private Tastatur meineTastatur;
+    private Knopf kEnde, kLoesche, kHintergrund;
+    private TextFeld tfModus;
+    private Rollbalken rbRot,  rbGruen , rbBlau;
+    private WahlBox wbDueen, wbMittel, wbDick;
+    private WahlBoxGruppe wbgLienenbreite ;
+    
 
-{% data reusables.repositories.navigate-to-repo %}
-{% if enterpriseServerVersions contains currentVersion and currentVersion ver_lt "enterprise-server@2.22" %}
-2. Under your repository name, click **Upload files**.
-  ![Upload files button](/assets/images/help/repository/upload-files-button.png)
-{% else %}
-2. Above the list of files, using the **Add file** drop-down, click **Upload files**.
-  !["Upload files" in the "Add file" dropdown](/assets/images/help/repository/upload-files-button.png)
-{% endif %}
-3. Drag and drop the file or folder you'd like to upload to your repository onto the file tree.
-![Drag and drop area](/assets/images/help/repository/upload-files-drag-and-drop.png)
-{% data reusables.files.write_commit_message %}
-{% data reusables.files.choose_commit_branch %}
-6. Click **Commit changes**.
-![Commit changes button](/assets/images/help/repository/commit-changes-button.png)
+    // Erzeugung
+    public Paint() {
+        fenster = new Fenster(800, 600);
+        leinwand = new Leinwand(0, 100, fenster.breite() - 130, fenster.hoehe() - 120);
+        meinStift = new Stift();
+        spiegelStift = new Stift();
+        spiegeln = false;
+        farbStift = new Stift(leinwand);
+        meineMaus = new Maus(leinwand);
+        meineTastatur = new Tastatur();
+        kEnde = new Knopf("Ende",fenster.breite()-120,fenster.hoehe()-30, 100, 20);
+        kLoesche = new Knopf("Löschen",fenster.breite()-120,fenster.hoehe()-60, 100, 20);
+        kHintergrund = new Knopf("Hintergrund",fenster.breite()-120,fenster.hoehe()-90, 100, 20);
+        rbRot = new Rollbalken(true,fenster.breite()-120,30,100,20);
+        rbGruen  = new Rollbalken(true,fenster.breite()-120,60,100,20);  
+        rbBlau = new Rollbalken(true,fenster.breite()-120,90,100,20);
+        tfModus = new TextFeld(150, 30, 100, 50);
+        wbDueen = new WahlBox("dünn",5,30,100,20);
+        wbMittel = new WahlBox("mittel",5,50,100,20);
+        wbDick = new WahlBox("dick",5,70,100,20);
+        wbgLienenbreite  = new WahlBoxGruppe();
+        wbgLienenbreite.fuegeEin(wbDick);
+        wbgLienenbreite.fuegeEin(wbDueen);
+        wbgLienenbreite.fuegeEin(wbMittel);
+        wbDueen.setzeZustand(true);
+        wbMittel.setzeZustand(false);
+        wbDick.setzeZustand(false);
+        
+        // Benutuzung
+        
+       
+        rbRot.setzeMinimum(0);
+        rbRot.setzeMaximum(255);
+     
+        rbGruen.setzeMinimum(0);
+        rbGruen.setzeMaximum(255);
+        
+        rbBlau.setzeMinimum(0);
+        rbBlau.setzeMaximum(255);
+        
+        leinwand.setzeRand(Farbe.SCHWARZ, 2);
+        meinStift.maleAuf(leinwand);
+        spiegelStift.maleAuf(leinwand);
+        
+        
+
+    }
+
+    public void fuehreAus() {
+        
+        while(!kEnde.wurdeGedrueckt()) {
+        	
+        Hilfe.kurzePause();
+        meinStift.bewegeAuf(meineMaus.hPosition(), meineMaus.vPosition());
+        spiegelStift.bewegeBis(meineMaus.vPosition(), meineMaus.hPosition());
+        
+        //if-else-Verzweigung
+        if (meineMaus.istGedrueckt() && spiegeln ) {
+			meinStift.runter();
+		} else if(meineMaus.istGedrueckt() && !spiegeln){
+			meinStift.runter();	
+		} else {	
+			meinStift.hoch();		
+        }
+        
+        if(kLoesche.wurdeGedrueckt()) {
+        leinwand.loescheAlles();
+        
+        }
+        if (rbRot.wurdeBewegt()) {
+        	rbRot.setzeWert(rbRot.wert());
+        	farbStift.rechteck(10, 20, 30, 70);
+        	farbStift.setzeFuellMuster(Muster.GEFUELLT);
+        	meinStift.setzeFarbe(Farbe.rgb(rbRot.wert(),rbGruen.wert() , rbBlau.wert()));
+        	farbStift.setzeFarbe(Farbe.rgb(rbRot.wert(),rbGruen.wert() , rbBlau.wert()));
+        }
+        if (rbGruen.wurdeBewegt()) {
+        	rbGruen.setzeWert(rbGruen.wert());
+        	farbStift.rechteck(10, 20, 30, 70);
+        	farbStift.setzeFuellMuster(Muster.GEFUELLT);
+        	farbStift.setzeFarbe(Farbe.rgb(rbRot.wert(),rbGruen.wert() , rbBlau.wert()));
+        	meinStift.setzeFarbe(Farbe.rgb(rbRot.wert(),rbGruen.wert() , rbBlau.wert()));
+        }
+        if(rbBlau.wurdeBewegt()) {
+        	rbBlau.setzeWert(rbBlau.wert());
+        	farbStift.rechteck(10, 20, 30, 70);
+        	farbStift.setzeFuellMuster(Muster.GEFUELLT);
+        	farbStift.setzeFarbe(Farbe.rgb(rbRot.wert(),rbGruen.wert() , rbBlau.wert()));
+        	meinStift.setzeFarbe(Farbe.rgb(rbRot.wert(),rbGruen.wert() , rbBlau.wert()));
+        }
+//        if(meineTastatur.istGedrueckt('r')) {
+//        meinStift.radiere();
+//        } else if (meineTastatur.istGedrueckt('n')) {
+//        meinStift.normal();
+//        } else if (meineTastatur.istGedrueckt('s')) {
+//        
+//        }
+        switch(meineTastatur.zeichen()) {
+        case 'r': {
+        meinStift.setzeLinienBreite(10);
+        meinStift.radiere(); 
+        tfModus.setzeText("RADIEREN");
+        break;
+        
+        }
+        case 'n': {
+        meinStift.setzeLinienBreite(1);
+        meinStift.normal();
+        tfModus.setzeText("Normal");
+        break;
+        }
+        case 's':{
+        
+        tfModus.setzeText("SPIEGL");
+        break;
+        }
+        }
+        
+        
+       if(wbDueen.istGewaehlt()) {
+    	   meinStift.setzeLinienBreite(0);
+       }
+        else if(wbMittel.istGewaehlt()) {
+       	meinStift.setzeLinienBreite(3);
+       }
+       else if(wbDick.istGewaehlt()) {
+    	meinStift.setzeLinienBreite(5);
+       }
+       if (kHintergrund.wurdeGedrueckt()) {
+    	leinwand.setzeHintergrundFarbe(Farbe.rgb(rbRot.wert(),rbGruen.wert() , rbBlau.wert()));
+       }
+        }
+        
+        
+        fenster.gibFrei();
+        
+    
+        if(meineMaus.istRechtsGedrueckt()) {
+        meinStift.runter(); 
+        }
+        }
+
+
+    public static void main(String[] args) {
+        Paint paint;
+        paint = new Paint();
+        paint.fuehreAus();
+
+    }
+
+}
